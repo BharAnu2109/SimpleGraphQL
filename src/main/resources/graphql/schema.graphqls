@@ -1,0 +1,133 @@
+# Customer Type
+type Customer {
+    id: ID!
+    name: String!
+    email: String!
+    phone: String!
+    address: String!
+    accounts: [Account!]
+}
+
+# Account Type
+type Account {
+    id: ID!
+    accountNumber: String!
+    accountType: AccountType!
+    balance: Float!
+    createdAt: String!
+    status: AccountStatus!
+    customer: Customer!
+    transactions: [Transaction!]
+}
+
+# Transaction Type
+type Transaction {
+    id: ID!
+    transactionId: String!
+    type: TransactionType!
+    amount: Float!
+    timestamp: String!
+    description: String!
+    balanceAfter: Float!
+    toAccountNumber: String
+    fromAccountNumber: String
+}
+
+# Enums
+enum AccountType {
+    SAVINGS
+    CHECKING
+    BUSINESS
+}
+
+enum AccountStatus {
+    ACTIVE
+    INACTIVE
+    FROZEN
+    CLOSED
+}
+
+enum TransactionType {
+    DEPOSIT
+    WITHDRAWAL
+    TRANSFER_IN
+    TRANSFER_OUT
+}
+
+# Input Types
+input CreateCustomerInput {
+    name: String!
+    email: String!
+    phone: String!
+    address: String!
+}
+
+input UpdateCustomerInput {
+    id: ID!
+    name: String
+    phone: String
+    address: String
+}
+
+input CreateAccountInput {
+    customerId: ID!
+    accountType: AccountType!
+    initialDeposit: Float!
+}
+
+input DepositInput {
+    accountNumber: String!
+    amount: Float!
+    description: String!
+}
+
+input WithdrawInput {
+    accountNumber: String!
+    amount: Float!
+    description: String!
+}
+
+input TransferInput {
+    fromAccountNumber: String!
+    toAccountNumber: String!
+    amount: Float!
+    description: String!
+}
+
+# Queries
+type Query {
+    # Customer Queries
+    getAllCustomers: [Customer!]!
+    getCustomerById(id: ID!): Customer
+    getCustomerByEmail(email: String!): Customer
+    
+    # Account Queries
+    getAllAccounts: [Account!]!
+    getAccountById(id: ID!): Account
+    getAccountByNumber(accountNumber: String!): Account
+    getAccountsByCustomerId(customerId: ID!): [Account!]!
+    getBalance(accountNumber: String!): Float!
+    
+    # Transaction Queries
+    getTransactionHistory(accountNumber: String!): [Transaction!]!
+    getTransactionsByType(accountNumber: String!, type: TransactionType!): [Transaction!]!
+    getTransactionsByDateRange(accountNumber: String!, startDate: String!, endDate: String!): [Transaction!]!
+}
+
+# Mutations
+type Mutation {
+    # Customer Mutations
+    createCustomer(input: CreateCustomerInput!): Customer!
+    updateCustomer(input: UpdateCustomerInput!): Customer!
+    deleteCustomer(id: ID!): Boolean!
+    
+    # Account Mutations
+    createAccount(input: CreateAccountInput!): Account!
+    updateAccountStatus(accountNumber: String!, status: AccountStatus!): Account!
+    closeAccount(accountNumber: String!): Boolean!
+    
+    # Transaction Mutations
+    deposit(input: DepositInput!): Transaction!
+    withdraw(input: WithdrawInput!): Transaction!
+    transfer(input: TransferInput!): [Transaction!]!
+}
